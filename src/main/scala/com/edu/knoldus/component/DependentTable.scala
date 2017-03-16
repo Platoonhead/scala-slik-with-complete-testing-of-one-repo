@@ -2,11 +2,10 @@ package com.edu.knoldus.component
 
 import com.edu.knoldus.models.Dependents
 import connections.{ConnectedDbMysql, DBProvider}
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait DependentTable extends ConnectedDbMysql{
+trait DependentTable{
 
   this: DBProvider =>
 
@@ -27,7 +26,7 @@ trait DependentTable extends ConnectedDbMysql{
   val dependentTableQuery = TableQuery[DependentTable]
 
 }
-  trait DependentComponent extends DependentTable with ProjectTable {
+  trait DependentComponent extends DependentTable with ProjectTable{
 
     this :  DBProvider =>
     import driver.api._
@@ -52,7 +51,7 @@ trait DependentTable extends ConnectedDbMysql{
 
     def upsertRecord(dependent: Dependents): Future[Boolean] ={
       updateRecord(dependent).map{
-      res => if(res == 0) { insertRecord(dependent) ; true} else false
+      res => if(res == 0) { insertRecord(dependent) ; true} else true
       }.recover {
       case ex: Throwable => false
       }
@@ -62,14 +61,9 @@ trait DependentTable extends ConnectedDbMysql{
       dependentTableQuery.to[List].filter(_.age>=60).result
     }
 
-    /*def crossJoin = db.run{
-      (for {
-          (c, s) <- projectTableQuery join dependentTableQuery
-        } yield (c.id, s.name)).to[List].result
-    }*/
   }
 
-  object ForDependentTable extends DependentComponent
+  object ForDependentTable extends DependentComponent with ConnectedDbMysql
 
 
 

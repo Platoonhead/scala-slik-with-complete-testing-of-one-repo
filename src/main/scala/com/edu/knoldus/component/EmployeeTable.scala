@@ -5,7 +5,7 @@ import connections.{ConnectedDbMysql, DBProvider}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait EmployeeTable extends ConnectedDbMysql {
+trait EmployeeTable{
 
     this : DBProvider =>
     import driver.api._
@@ -46,7 +46,7 @@ trait EmployeeComponent extends EmployeeTable {
 
     def upsertRecord(emp:Employee): Future[Boolean] ={
       updateRecord(emp).map{
-        res => if(res == 0) { insertRecord(emp) ; true} else false
+        res => if(res == 0) { insertRecord(emp) ; true} else true
       }.recover {
         case ex: Throwable => false
       }
@@ -58,8 +58,7 @@ trait EmployeeComponent extends EmployeeTable {
 
 }
 
-object ForEmployeeTable extends EmployeeComponent
-
+object ForEmployeeTable extends EmployeeComponent with ConnectedDbMysql
 
 
 
